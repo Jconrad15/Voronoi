@@ -10,11 +10,11 @@ namespace Voronoi
         [SerializeField]
         private Material cellMaterial;
 
-        public int xSize = 10;
-        public int zSize = 10;
-        public int cellCount;
+        private int xSize = 50;
+        private int zSize = 50;
+        private int cellCount;
 
-        public int seedCount = 4;
+        private int seedCount = 30;
 
         private Cell[] cells;
 
@@ -66,7 +66,6 @@ namespace Voronoi
             int[] seedIndices = SelectSeedCells();
             foreach (int seedIndex in seedIndices)
             {
-
                 cells[seedIndex].SetAsSeedCell();
             }
         }
@@ -77,16 +76,16 @@ namespace Voronoi
             if (seedCount > cellCount)
             {
                 Debug.LogWarning("seedCount is set to greater than the cellCount");
-                seedCount = cellCount;
+                seedCount = xSize / 2;
             }
 
             int[] seedIndices = new int[seedCount];
             for (int i = 0; i < seedCount; i++)
             {
-                int randomValue = Random.Range(0, seedCount);
-                while (seedIndices.Contains(randomValue) == true)
+                int randomValue = Random.Range(0, cellCount);
+                while (seedIndices.Contains(randomValue))
                 {
-                    randomValue = Random.Range(0, seedCount);
+                    randomValue = Random.Range(0, cellCount);
                 }
 
                 seedIndices[i] = randomValue;

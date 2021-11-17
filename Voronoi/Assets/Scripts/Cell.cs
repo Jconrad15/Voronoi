@@ -57,6 +57,9 @@ namespace Voronoi
             CurrentColor = Utility.RandomColor(1);
             Renderer cube_r = cube.GetComponent<Renderer>();
             cube_r.material.color = CurrentColor;
+
+            //cube_r.material.SetFloat("_Glossiness", 1f);
+            cube_r.material.SetFloat("_Metallic", 0.5f);
         }
 
         public void UpdateSeedCell(Cell seedCell)
