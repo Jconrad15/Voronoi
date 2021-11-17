@@ -6,11 +6,16 @@ namespace Voronoi
 {
     public class Cell : MonoBehaviour
     {
-
         public Vector3 position;
         public int index;
 
+        public Color CurrentColor { get; protected set; }
+
         private GameObject cube;
+
+        public Cell SeedCell { get; protected set; }
+
+        public bool IsSeedCell { get; protected set; }
 
         public void InitializeCell(int x, int z, int index, Material cellMaterial)
         {
@@ -23,18 +28,47 @@ namespace Voronoi
 
             Renderer cube_r = cube.GetComponent<Renderer>();
             cube_r.material = cellMaterial;
+            cube_r.material.color = CellMetrics.defaultColor;
+            CurrentColor = CellMetrics.defaultColor;
         }
 
         public void SetColor(Color newColor)
         {
-            cube.GetComponent<Renderer>().material.color = newColor;
+            CurrentColor = newColor;
+            cube.GetComponent<Renderer>().material.color = CurrentColor;
         }
 
         public Color GetColor()
         {
-            return cube.GetComponent<Renderer>().material.color;
+            return CurrentColor;
         }
 
+        public void SetAsSeedCell()
+        {
+            if (IsSeedCell)
+            {
+                Debug.LogWarning("Changing seed cell when cell is a seedCell itself.");
+                return;
+            }
+            IsSeedCell = true;
+            SeedCell = this;
+
+            // Select the color for this seed
+            CurrentColor = Utility.RandomColor(1);
+            Renderer cube_r = cube.GetComponent<Renderer>();
+            cube_r.material.color = CurrentColor;
+        }
+
+        public void UpdateSeedCell(Cell seedCell)
+        {
+            if (IsSeedCell) 
+            { 
+                Debug.LogWarning("Changing seed cell when cell is a seedCell itself.");
+                return;
+            }
+
+            SeedCell = seedCell;
+        }
 
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,15 +14,36 @@ namespace Voronoi
         public int zSize = 10;
         public int cellCount;
 
+        public int seedCount = 4;
+
         private Cell[] cells;
 
         private float[] steps;
 
         // Start is called before the first frame update
-        void OnEnable()
+        private void OnEnable()
         {
             CreateGrid();
             JumpFlood();
+        }
+
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Clear();
+
+                CreateGrid();
+                JumpFlood();
+            }
+        }
+
+        private void Clear()
+        {
+            foreach (Cell cell in cells)
+            {
+                Destroy(cell.gameObject);
+            }
         }
 
         private void CreateGrid()
@@ -30,7 +52,6 @@ namespace Voronoi
             cells = new Cell[cellCount];
 
             int index = 0;
-
             for (int x = 0; x < xSize; x++)
             {
                 for (int z = 0; z < zSize; z++)
@@ -40,6 +61,38 @@ namespace Voronoi
                     index += 1;
                 }
             }
+
+            // Determine seed cells
+            int[] seedIndices = SelectSeedCells();
+            foreach (int seedIndex in seedIndices)
+            {
+
+                cells[seedIndex].SetAsSeedCell();
+            }
+        }
+
+        private int[] SelectSeedCells()
+        {
+            // limit seeds by number of cells
+            if (seedCount > cellCount)
+            {
+                Debug.LogWarning("seedCount is set to greater than the cellCount");
+                seedCount = cellCount;
+            }
+
+            int[] seedIndices = new int[seedCount];
+            for (int i = 0; i < seedCount; i++)
+            {
+                int randomValue = Random.Range(0, seedCount);
+                while (seedIndices.Contains(randomValue) == true)
+                {
+                    randomValue = Random.Range(0, seedCount);
+                }
+
+                seedIndices[i] = randomValue;
+            }
+
+            return seedIndices;
         }
 
         private Cell CreateCell(int x, int z, int index)
@@ -77,6 +130,8 @@ namespace Voronoi
                 new Vector2(1, 1)
             };
 
+            Color defaultColor = CellMetrics.defaultColor;
+
             // Iterate over each step size
             for (int k = 0; k < steps.Length; k++)
             {
@@ -88,19 +143,62 @@ namespace Voronoi
                         // For neighboring cells based on step size
                         foreach (Vector2 offset in neighborRef)
                         {
-                            Cell neighborq = GetCell(
-                                x + ((int)offset.x * k),
-                                z + ((int)offset.y * k));
+                            // Neighbor positions
+                            int neighborX = x + ((int)offset.x * k);
+                            int neighborZ = z + ((int)offset.y * k);
+
+                            // Only get in bounds neighbors
+                            if (neighborX < 0 || neighborX > xSize - 1) { continue; }
+                            if (neighborZ < 0 || neighborZ > zSize - 1) { continue; }
+
+                            // Get cells
+                            // Skip if this is a seed cell
+                            Cell cell = GetCell(x, z);
+                            if (cell.IsSeedCell) { continue; }
+                            Cell neighborCell = GetCell(neighborX, neighborZ);
 
                             // Compare neighbor color to cell color
-                            // recolor based on distance to seeds
+                            if (cell.CurrentColor == defaultColor)
+                            {
+                                if (neighborCell.CurrentColor != defaultColor)
+                                {
+                                    // Change cell's color to neighbor's color
+                                    cell.SetColor(neighborCell.GetColor());
+                                    cell.UpdateSeedCell(neighborCell.SeedCell);
+                                }
+                                // Otherwise do nothing if both are default color
+                            }
+                            else
+                            {
+                                // The cell does not have a default color
+                                if (neighborCell.CurrentColor != defaultColor)
+                                {
+                                    if (cell.SeedCell == null) 
+                                    {
+                                        Debug.LogError("SeedCell is null");
+                                        return; 
+                                    }
+                                    // Both cells are colored
+                                    float distCurrentSeed =
+                                        Vector3.Distance(cell.position, cell.SeedCell.position);
+                                    float distNeighborSeed =
+                                        Vector3.Distance(cell.position, neighborCell.SeedCell.position);
 
-                        }
+                                    // If the neighbor's seed is closer than the current seed
+                                    if (distCurrentSeed > distNeighborSeed)
+                                    {
+                                        // Change the seed cell and color
+                                        cell.SetColor(neighborCell.CurrentColor);
+                                        cell.UpdateSeedCell(neighborCell.SeedCell);
+                                    }
 
-                    }
-                }
-            }
-
+                                }
+                                // Do nothing if neighbor is default color
+                            }
+                        } // End neighbors
+                    } // End z
+                } // End x
+            } // End step iteration
         }
 
         private Cell GetCell(int x, int z)
