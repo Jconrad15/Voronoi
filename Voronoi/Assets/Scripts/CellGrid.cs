@@ -6,6 +6,8 @@ namespace Voronoi
 {
     public class CellGrid : MonoBehaviour
     {
+        [SerializeField]
+        private Material cellMaterial;
 
         public int xSize = 10;
         public int zSize = 10;
@@ -14,6 +16,12 @@ namespace Voronoi
 
         // Start is called before the first frame update
         void OnEnable()
+        {
+            CreateGrid();
+            JumpFlood();
+        }
+
+        private void CreateGrid()
         {
             cells = new Cell[xSize * zSize];
 
@@ -24,12 +32,10 @@ namespace Voronoi
                 for (int z = 0; z < zSize; z++)
                 {
                     cells[index] = CreateCell(x, z, index);
+
                     index += 1;
                 }
             }
-
-
-
         }
 
         private Cell CreateCell(int x, int z, int index)
@@ -38,9 +44,29 @@ namespace Voronoi
             cell_go.transform.SetParent(this.transform);
 
             Cell cell = cell_go.AddComponent<Cell>();
-            cell.InitializeCell(x, z, index);
+            cell.InitializeCell(x, z, index, cellMaterial);
             return cell;
         }
+
+        private void JumpFlood()
+        {
+            for (int x = 0; x < xSize; x++)
+            {
+                for (int z = 0; z < zSize; z++)
+                {
+
+                }
+            }
+
+        }
+
+        private Cell GetCell(int x, int z)
+        {
+            int i = (x * xSize) + z;
+
+            return cells[i];
+        }
+
 
     }
 }
