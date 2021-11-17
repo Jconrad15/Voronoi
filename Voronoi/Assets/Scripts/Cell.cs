@@ -30,6 +30,10 @@ namespace Voronoi
             cube.GetComponent<Renderer>().material.color = newColor;
         }
 
+        public Color GetColor()
+        {
+            return cube.GetComponent<Renderer>().material.color;
+        }
 
 
     }
