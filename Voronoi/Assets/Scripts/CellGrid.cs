@@ -106,8 +106,9 @@ namespace Voronoi
 
         private void JumpFlood()
         {
-            steps = new float[4]
+            steps = new float[5]
             {
+                cellCount,
                 cellCount/2f,
                 cellCount/4f,
                 cellCount/8f,
@@ -179,9 +180,9 @@ namespace Voronoi
                                     }
                                     // Both cells are colored
                                     float distCurrentSeed =
-                                        Vector3.Distance(cell.position, cell.SeedCell.position);
+                                        Vector3.Distance(cell.CellPosition, cell.SeedCell.CellPosition);
                                     float distNeighborSeed =
-                                        Vector3.Distance(cell.position, neighborCell.SeedCell.position);
+                                        Vector3.Distance(cell.CellPosition, neighborCell.SeedCell.CellPosition);
 
                                     // If the neighbor's seed is closer than the current seed
                                     if (distCurrentSeed > distNeighborSeed)

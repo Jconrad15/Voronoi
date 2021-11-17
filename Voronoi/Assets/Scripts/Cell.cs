@@ -6,7 +6,19 @@ namespace Voronoi
 {
     public class Cell : MonoBehaviour
     {
-        public Vector3 position;
+        private Vector3 cellPosition;
+        public Vector3 CellPosition
+        {
+            get
+            {
+                return cellPosition;
+            }
+            set
+            {
+                cellPosition = value;
+                cube.transform.position = cellPosition;
+            }
+        }
         public int index;
 
         public Color CurrentColor { get; protected set; }
@@ -19,11 +31,11 @@ namespace Voronoi
 
         public void InitializeCell(int x, int z, int index, Material cellMaterial)
         {
-            position = new Vector3(x, 0, z);
+            cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+            CellPosition = new Vector3(x, 0, z);
             this.index = index;
 
-            cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = position;
             cube.transform.SetParent(this.transform);
 
             Renderer cube_r = cube.GetComponent<Renderer>();
@@ -60,6 +72,11 @@ namespace Voronoi
 
             //cube_r.material.SetFloat("_Glossiness", 1f);
             cube_r.material.SetFloat("_Metallic", 0.5f);
+
+            // Change height for the seed cells
+            Vector3 changedHeight = CellPosition;
+            changedHeight.y = Random.value * CellMetrics.heightScale;
+            CellPosition = changedHeight;
         }
 
         public void UpdateSeedCell(Cell seedCell)
@@ -71,6 +88,10 @@ namespace Voronoi
             }
 
             SeedCell = seedCell;
+            // Change height to match the seed cell
+            Vector3 changedHeight = CellPosition;
+            changedHeight.y = seedCell.CellPosition.y;
+            CellPosition = changedHeight;
         }
 
     }
