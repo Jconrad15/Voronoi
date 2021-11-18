@@ -10,11 +10,11 @@ namespace Voronoi
         [SerializeField]
         private Material cellMaterial;
 
-        private int xSize = 50;
-        private int zSize = 50;
+        private int xSize = 100;
+        private int zSize = 100;
         private int cellCount;
 
-        private int seedCount = 20;
+        private int seedCount = 50;
 
         private Cell[] cells;
 
@@ -36,6 +36,7 @@ namespace Voronoi
             {
                 Clear();
 
+                GenerateColors();
                 CreateGrid();
                 JumpFlood();
             }
@@ -67,9 +68,11 @@ namespace Voronoi
 
             // Determine seed cells
             int[] seedIndices = SelectSeedCells();
+            int counter = 0;
             foreach (int seedIndex in seedIndices)
             {
-                cells[seedIndex].SetAsSeedCell(Utility.RandomColor(1));
+                cells[seedIndex].SetAsSeedCell(colors[counter]);
+                counter += 1;
             }
         }
 
@@ -78,8 +81,8 @@ namespace Voronoi
             // limit seeds by number of cells
             if (seedCount > cellCount)
             {
-                Debug.LogWarning("seedCount is set to greater than the cellCount");
-                seedCount = xSize / 2;
+                Debug.LogError("seedCount is set to greater than the cellCount");
+                return null;
             }
 
             int[] seedIndices = new int[seedCount];
@@ -219,13 +222,24 @@ namespace Voronoi
 
             for (int i = 0; i < seedCount; i++)
             {
-                Color newColor = Utility.RandomColor(1);
-
-                // TODO eliminate repeat colors
+                Color newColor;
+                if (i == 0)
+                {
+                    // Random color for the first index
+                    newColor = Color.HSVToRGB(
+                        Random.value,
+                        Random.Range(0.4f, 0.6f),
+                        0.8f);
+                }
+                else
+                {
+                    // New color is based on previous color
+                    newColor = Utility.ColorShift(colors[i - 1],
+                        1f / seedCount, Random.Range(-.05f, .05f), Random.Range(-.05f, .05f));
+                }
 
                 colors[i] = newColor;
             }
-
         }
 
 

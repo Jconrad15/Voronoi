@@ -20,6 +20,22 @@ namespace Voronoi
             return newColor;
         }
 
+        public static Color ColorShift(Color color, float hAmount, float sAmount, float vAmount)
+        {
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+
+            h = Mathf.Clamp01(h + hAmount);
+            s = Mathf.Clamp01(s + sAmount);
+            v = Mathf.Clamp01(v + vAmount);
+
+
+            Debug.Log("h: " + h + "s: " + s + "v: " + v);
+
+            color = Color.HSVToRGB(h, s, v);
+
+            return color;
+        }
+
 
     }
 }
