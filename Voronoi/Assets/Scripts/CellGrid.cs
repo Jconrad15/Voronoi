@@ -106,12 +106,14 @@ namespace Voronoi
 
         private void JumpFlood()
         {
-            steps = new float[5]
+            steps = new float[7]
             {
                 cellCount,
                 cellCount/2f,
                 cellCount/4f,
                 cellCount/8f,
+                1,
+                2,
                 1
             };
 
