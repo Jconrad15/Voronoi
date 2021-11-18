@@ -69,7 +69,7 @@ namespace Voronoi
             int[] seedIndices = SelectSeedCells();
             foreach (int seedIndex in seedIndices)
             {
-                cells[seedIndex].SetAsSeedCell(colors[seedIndex]);
+                cells[seedIndex].SetAsSeedCell(Utility.RandomColor(1));
             }
         }
 
