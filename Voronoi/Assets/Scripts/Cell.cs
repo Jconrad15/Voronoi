@@ -55,7 +55,7 @@ namespace Voronoi
             return CurrentColor;
         }
 
-        public void SetAsSeedCell()
+        public void SetAsSeedCell(Color setColor)
         {
             if (IsSeedCell)
             {
@@ -66,7 +66,7 @@ namespace Voronoi
             SeedCell = this;
 
             // Select the color for this seed
-            CurrentColor = Utility.RandomColor(1);
+            CurrentColor = setColor;
             Renderer cube_r = cube.GetComponent<Renderer>();
             cube_r.material.color = CurrentColor;
 

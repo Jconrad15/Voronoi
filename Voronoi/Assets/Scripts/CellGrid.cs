@@ -14,15 +14,18 @@ namespace Voronoi
         private int zSize = 50;
         private int cellCount;
 
-        private int seedCount = 30;
+        private int seedCount = 20;
 
         private Cell[] cells;
 
         private float[] steps;
 
+        private Color[] colors;
+
         // Start is called before the first frame update
         private void OnEnable()
         {
+            GenerateColors();
             CreateGrid();
             JumpFlood();
         }
@@ -66,7 +69,7 @@ namespace Voronoi
             int[] seedIndices = SelectSeedCells();
             foreach (int seedIndex in seedIndices)
             {
-                cells[seedIndex].SetAsSeedCell();
+                cells[seedIndex].SetAsSeedCell(colors[seedIndex]);
             }
         }
 
@@ -209,6 +212,22 @@ namespace Voronoi
 
             return cells[i];
         }
+
+        private void GenerateColors()
+        {
+            colors = new Color[seedCount];
+
+            for (int i = 0; i < seedCount; i++)
+            {
+                Color newColor = Utility.RandomColor(1);
+
+                // TODO eliminate repeat colors
+
+                colors[i] = newColor;
+            }
+
+        }
+
 
 
     }
