@@ -33,7 +33,6 @@ namespace Voronoi
             if (Input.GetMouseButtonDown(0))
             {
                 Clear();
-
                 Generate();
             }
         }
