@@ -25,9 +25,7 @@ namespace Voronoi
         // Start is called before the first frame update
         private void OnEnable()
         {
-            GenerateColors();
-            CreateGrid();
-            JumpFlood();
+            Generate();
         }
 
         private void Update()
@@ -36,11 +34,28 @@ namespace Voronoi
             {
                 Clear();
 
-                GenerateColors();
-                CreateGrid();
-                JumpFlood();
+                Generate();
             }
         }
+
+        private void Generate()
+        {
+            //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            //stopwatch.Start();
+
+            GenerateColors();
+            CreateGrid();
+            JumpFlood();
+            /*
+            stopwatch.Stop();
+            System.TimeSpan ts = stopwatch.Elapsed;
+            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            Debug.Log("RunTime " + elapsedTime);
+            */
+        }
+
 
         private void Clear()
         {
