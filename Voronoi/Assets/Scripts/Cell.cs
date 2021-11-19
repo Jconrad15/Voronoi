@@ -80,9 +80,9 @@ namespace Voronoi
             cube_r.material.SetFloat("_Metallic", 0.5f);
 
             // Change height for the seed cells
-            Vector3 changedHeight = CellPosition;
+/*            Vector3 changedHeight = CellPosition;
             changedHeight.y = Random.value * CellMetrics.heightScale;
-            CellPosition = changedHeight;
+            CellPosition = changedHeight;*/
         }
 
         public void UpdateSeedCell(Cell seedCell)
