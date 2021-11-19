@@ -243,14 +243,14 @@ namespace Voronoi
                     // Random color for the first index
                     newColor = Color.HSVToRGB(
                         Random.value,
-                        Random.Range(0.4f, 0.6f),
-                        0.8f);
+                        0.7f,
+                        0.6f);
                 }
                 else
                 {
                     // New color is based on previous color
                     newColor = Utility.ColorShift(colors[i - 1],
-                        1f / seedCount, Random.Range(-.05f, .05f), Random.Range(-.05f, .05f));
+                        1f / seedCount, 0, 0);//Random.Range(-.02f, .02f), Random.Range(-.02f, .02f));
                 }
 
                 colors[i] = newColor;
