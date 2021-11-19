@@ -8,6 +8,9 @@ namespace Voronoi
     public class CellGrid : MonoBehaviour
     {
         [SerializeField]
+        private ModelHandler modelHandler;
+
+        [SerializeField]
         private Material cellMaterial;
 
         private int xSize = 100;
@@ -22,10 +25,12 @@ namespace Voronoi
 
         private Color[] colors;
 
+        private int[] seedIndices;
+
         // Start is called before the first frame update
         private void OnEnable()
         {
-            Generate();
+            GenerateWorld();
         }
 
         private void Update()
@@ -33,11 +38,11 @@ namespace Voronoi
             if (Input.GetMouseButtonDown(0))
             {
                 Clear();
-                Generate();
+                GenerateWorld();
             }
         }
 
-        private void Generate()
+        private void GenerateWorld()
         {
             //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             //stopwatch.Start();
@@ -45,6 +50,10 @@ namespace Voronoi
             GenerateColors();
             CreateGrid();
             JumpFlood();
+
+            PlaceCellModels();
+
+
             /*
             stopwatch.Stop();
             System.TimeSpan ts = stopwatch.Elapsed;
@@ -55,7 +64,9 @@ namespace Voronoi
             */
         }
 
-
+        /// <summary>
+        /// Destory all previous gameobjects.
+        /// </summary>
         private void Clear()
         {
             foreach (Cell cell in cells)
@@ -81,15 +92,29 @@ namespace Voronoi
             }
 
             // Determine seed cells
-            int[] seedIndices = SelectSeedCells();
+            seedIndices = SelectSeedCells();
             int counter = 0;
             foreach (int seedIndex in seedIndices)
             {
                 cells[seedIndex].SetAsSeedCell(colors[counter]);
                 counter += 1;
             }
+
+            // Determine seed cell development type
+            for (int i = 0; i < seedIndices.Length; i++)
+            {
+                // Get seed cell
+                Cell seedCell = cells[seedIndices[i]];
+                // Set Development
+                seedCell.DevType = Utility.GetRandomEnum<DevelopmentType>();
+            }
+
         }
 
+        /// <summary>
+        /// Returns an integer array for selected cell indicies.
+        /// </summary>
+        /// <returns></returns>
         private int[] SelectSeedCells()
         {
             // limit seeds by number of cells
@@ -99,21 +124,28 @@ namespace Voronoi
                 return null;
             }
 
-            int[] seedIndices = new int[seedCount];
+            int[] indices = new int[seedCount];
             for (int i = 0; i < seedCount; i++)
             {
                 int randomValue = Random.Range(0, cellCount);
-                while (seedIndices.Contains(randomValue))
+                while (indices.Contains(randomValue))
                 {
                     randomValue = Random.Range(0, cellCount);
                 }
 
-                seedIndices[i] = randomValue;
+                indices[i] = randomValue;
             }
 
-            return seedIndices;
+            return indices;
         }
 
+        /// <summary>
+        /// Creates and returns a cell.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="z"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private Cell CreateCell(int x, int z, int index)
         {
             GameObject cell_go = new GameObject("Cell " + x + ", " + z + ", i=" + index);
@@ -256,7 +288,15 @@ namespace Voronoi
             }
         }
 
-
+        private void PlaceCellModels()
+        {
+            for (int i = 0; i < cells.Length; i++)
+            {
+                Cell cell = cells[i];
+                // Place a model from modelHandler at every cell
+                cell.PlaceModel(modelHandler.GetModel(cell.DevType, cell.IsSeedCell));
+            }
+        }
 
     }
 }

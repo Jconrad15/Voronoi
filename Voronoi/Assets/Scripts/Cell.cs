@@ -27,6 +27,7 @@ namespace Voronoi
         public Color CurrentColor { get; protected set; }
 
         private GameObject cube;
+        private GameObject model;
 
         public Cell SeedCell { get; protected set; }
 
@@ -97,7 +98,24 @@ namespace Voronoi
             Vector3 changedHeight = CellPosition;
             changedHeight.y = seedCell.CellPosition.y;
             CellPosition = changedHeight;
+
+            // Change development type to match the seed cell
+            DevType = seedCell.DevType;
         }
+
+        public void PlaceModel(GameObject modelPrefab)
+        {
+            model = Instantiate(modelPrefab);
+            model.transform.SetParent(this.transform);
+
+            Vector3 modelPosition = cellPosition;
+            model.transform.position = modelPosition;
+            modelPosition.y += cube.transform.localScale.y / 2f;
+
+
+        }
+
+
 
     }
 }
