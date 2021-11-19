@@ -1,12 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Voronoi
 {
     public static class Utility
     {
-
+        /// <summary>
+        /// Returns a random color with the given alpha.
+        /// </summary>
+        /// <param name="alpha"></param>
+        /// <returns></returns>
         public static Color RandomColor(float alpha)
         {
             Mathf.Clamp01(alpha);
@@ -33,6 +37,17 @@ namespace Voronoi
             return color;
         }
 
+        /// <summary>
+        /// Returns a random Enum of given type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetRandomEnum<T>()
+        {
+            Array enumArray = Enum.GetValues(typeof(T));
+            T selectedEnum = (T)enumArray.GetValue(UnityEngine.Random.Range(0, enumArray.Length));
+            return selectedEnum;
+        }
 
     }
 }

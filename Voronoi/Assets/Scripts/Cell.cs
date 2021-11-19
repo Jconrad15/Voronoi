@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Voronoi
 {
+
+    public enum DevelopmentType { urban, suburban, rural };
+
     public class Cell : MonoBehaviour
     {
         private Vector3 cellPosition;
@@ -28,6 +31,8 @@ namespace Voronoi
         public Cell SeedCell { get; protected set; }
 
         public bool IsSeedCell { get; protected set; }
+
+        public DevelopmentType DevType { get; set; }
 
         public void InitializeCell(int x, int z, int index, Material cellMaterial)
         {
