@@ -28,9 +28,6 @@ namespace Voronoi
             s = Mathf.Clamp01(s + sAmount);
             v = Mathf.Clamp01(v + vAmount);
 
-
-            Debug.Log("h: " + h + "s: " + s + "v: " + v);
-
             color = Color.HSVToRGB(h, s, v);
 
             return color;
