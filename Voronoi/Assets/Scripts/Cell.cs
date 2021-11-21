@@ -29,6 +29,21 @@ namespace Voronoi
         private GameObject cube;
         private GameObject model;
 
+        private bool isRoad;
+        public bool IsRoad
+        {
+            get
+            {
+                return isRoad;
+            }
+        }
+        public void AddRoad()
+        {
+            // Return if there is already a road
+            //if (isRoad) { return; }
+            isRoad = true;
+        }
+
         public Cell SeedCell { get; protected set; }
 
         public bool IsSeedCell { get; protected set; }
@@ -48,6 +63,9 @@ namespace Voronoi
             cube_r.material = cellMaterial;
             cube_r.material.color = CellMetrics.defaultColor;
             CurrentColor = CellMetrics.defaultColor;
+
+            // Set initial road value to false
+            isRoad = false;
         }
 
         public void SetColor(Color newColor)
@@ -105,12 +123,13 @@ namespace Voronoi
 
         public void PlaceModel(GameObject modelPrefab)
         {
+            Debug.Log(IsRoad);
             model = Instantiate(modelPrefab);
             model.transform.SetParent(this.transform);
 
             Vector3 modelPosition = cellPosition;
-            model.transform.position = modelPosition;
             modelPosition.y += cube.transform.localScale.y / 2f;
+            model.transform.position = modelPosition;
 
 
         }

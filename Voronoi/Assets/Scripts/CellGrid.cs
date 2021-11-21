@@ -51,6 +51,7 @@ namespace Voronoi
             CreateGrid();
             JumpFlood();
 
+            CreateRoads();
             PlaceCellModels();
 
 
@@ -288,11 +289,32 @@ namespace Voronoi
             }
         }
 
+        private void CreateRoads()
+        {
+            for (int i = 0; i < cells.Length; i++)
+            {
+                Cell cell = cells[i];
+
+                // Modulo the x position or z positions
+                // No road on the seed cells
+                if ((cell.CellPosition.x % 3 == 0 || cell.CellPosition.z % 5 == 0)
+                    && cell.IsSeedCell == false)
+                {
+                    cell.AddRoad();
+                }
+
+            }
+        }
+
         private void PlaceCellModels()
         {
             for (int i = 0; i < cells.Length; i++)
             {
                 Cell cell = cells[i];
+
+                // Do not place a model where there is a road
+                if (cell.IsRoad) { continue; }
+
                 // Place a model from modelHandler at every cell
                 cell.PlaceModel(modelHandler.GetModel(cell.DevType, cell.IsSeedCell));
             }
