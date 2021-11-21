@@ -6,6 +6,7 @@ namespace Voronoi
 {
 
     public enum DevelopmentType { urban, suburban, rural };
+    public enum Direction { N, E, S, W };
 
     public class Cell : MonoBehaviour
     {
@@ -37,11 +38,36 @@ namespace Voronoi
                 return isRoad;
             }
         }
-        public void AddRoad()
+
+        // N, E, S, W
+        private bool[] roadDirections = new bool[4];
+
+        public void AddRoad(Direction direction)
         {
-            // Return if there is already a road
-            //if (isRoad) { return; }
             isRoad = true;
+
+            roadDirections[(int)direction] = true;
+        }
+
+        public void AddRoad(Direction direction1, Direction direction2)
+        {
+            isRoad = true;
+
+            roadDirections[(int)direction1] = true;
+            roadDirections[(int)direction2] = true;
+        }
+
+        public int RoadDirectionCount()
+        {
+            int count = 0;
+            for (int i = 0; i < roadDirections.Length; i++)
+            {
+                if (roadDirections[i] == true)
+                {
+                    count += 1;
+                }
+            }
+            return count;
         }
 
         public Cell SeedCell { get; protected set; }
@@ -123,7 +149,6 @@ namespace Voronoi
 
         public void PlaceModel(GameObject modelPrefab)
         {
-            Debug.Log(IsRoad);
             model = Instantiate(modelPrefab);
             model.transform.SetParent(this.transform);
 

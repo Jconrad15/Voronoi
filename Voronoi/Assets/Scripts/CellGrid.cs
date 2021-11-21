@@ -258,9 +258,30 @@ namespace Voronoi
 
         private Cell GetCell(int x, int z)
         {
+            if (z > zSize || z < 0 ||
+                x > xSize || x < 0) 
+            { 
+                return null; 
+            }
+
             int i = (x * xSize) + z;
 
             return cells[i];
+        }
+
+        private Cell GetCell(Cell cell, Direction direction)
+        {
+            int xStart = (int)cell.CellPosition.x;
+            int zStart = (int)cell.CellPosition.z;
+
+            return direction switch
+            {
+                Direction.N => GetCell(xStart + 1, zStart),
+                Direction.E => GetCell(xStart, zStart + 1),
+                Direction.S => GetCell(xStart - 1, zStart),
+                Direction.W => GetCell(xStart, zStart - 1),
+                _ => null,
+            };
         }
 
         private void GenerateColors()
@@ -291,19 +312,17 @@ namespace Voronoi
 
         private void CreateRoads()
         {
-            for (int i = 0; i < cells.Length; i++)
+            // Select starting road cell
+            Cell startCell = cells[Random.Range(0, cells.Length)];
+
+            int roadLength = 20;
+            Cell currentCell = startCell;
+            for (int i = 0; i < roadLength; i++)
             {
-                Cell cell = cells[i];
-
-                // Modulo the x position or z positions
-                // No road on the seed cells
-                if ((cell.CellPosition.x % 3 == 0 || cell.CellPosition.z % 5 == 0)
-                    && cell.IsSeedCell == false)
-                {
-                    cell.AddRoad();
-                }
-
+                // TODO create roads here
             }
+
+
         }
 
         private void PlaceCellModels()
@@ -312,11 +331,10 @@ namespace Voronoi
             {
                 Cell cell = cells[i];
 
-                // Do not place a model where there is a road
-                if (cell.IsRoad) { continue; }
-
                 // Place a model from modelHandler at every cell
-                cell.PlaceModel(modelHandler.GetModel(cell.DevType, cell.IsSeedCell));
+                cell.PlaceModel(
+                    modelHandler.GetModel(
+                        cell.DevType, cell.IsSeedCell, cell.IsRoad));
             }
         }
 
