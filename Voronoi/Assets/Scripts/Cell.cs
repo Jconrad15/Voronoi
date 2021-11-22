@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Voronoi
 {
-
     public enum DevelopmentType { urban, suburban, rural };
     public enum Direction { N, E, S, W };
 
@@ -30,6 +29,8 @@ namespace Voronoi
         private GameObject cube;
         private GameObject model;
 
+        public CellGrid cellGrid;
+
         private bool isRoad;
         public bool IsRoad
         {
@@ -46,15 +47,21 @@ namespace Voronoi
         {
             isRoad = true;
 
+            // If already has road in direction, return
+            if (roadDirections[(int)direction]) { return; }
+
             roadDirections[(int)direction] = true;
+
+            // Need to also add a road to the neighbor cell
+            // in the opposite direction
+            Cell neighborCell = cellGrid.GetCell(this, direction);
+            neighborCell.AddRoad(OppositeDirection(direction));
         }
 
         public void AddRoad(Direction direction1, Direction direction2)
         {
-            isRoad = true;
-
-            roadDirections[(int)direction1] = true;
-            roadDirections[(int)direction2] = true;
+            AddRoad(direction1);
+            AddRoad(direction2);
         }
 
         public int RoadDirectionCount()
@@ -76,7 +83,7 @@ namespace Voronoi
 
         public DevelopmentType DevType { get; set; }
 
-        public void InitializeCell(int x, int z, int index, Material cellMaterial)
+        public void InitializeCell(int x, int z, int index, Material cellMaterial, CellGrid cellGrid)
         {
             cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
@@ -92,6 +99,8 @@ namespace Voronoi
 
             // Set initial road value to false
             isRoad = false;
+
+            this.cellGrid = cellGrid;
         }
 
         public void SetColor(Color newColor)
@@ -159,7 +168,30 @@ namespace Voronoi
 
         }
 
-
+        /// <summary>
+        /// Returns the opposite direction.
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public Direction OppositeDirection(Direction direction)
+        {
+            if (direction == Direction.N)
+            {
+                 return Direction.S;
+            }
+            else if (direction == Direction.S)
+            {
+                return Direction.N;
+            }
+            else if (direction == Direction.E)
+            {
+                return Direction.W;
+            }
+            else //if (direction == Direction.W)
+            {
+                return Direction.E;
+            }
+        }
 
     }
 }

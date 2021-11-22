@@ -153,7 +153,7 @@ namespace Voronoi
             cell_go.transform.SetParent(this.transform);
 
             Cell cell = cell_go.AddComponent<Cell>();
-            cell.InitializeCell(x, z, index, cellMaterial);
+            cell.InitializeCell(x, z, index, cellMaterial, this);
             return cell;
         }
 
@@ -256,7 +256,7 @@ namespace Voronoi
             } // End step iteration
         }
 
-        private Cell GetCell(int x, int z)
+        public Cell GetCell(int x, int z)
         {
             if (z > zSize || z < 0 ||
                 x > xSize || x < 0) 
@@ -269,7 +269,7 @@ namespace Voronoi
             return cells[i];
         }
 
-        private Cell GetCell(Cell cell, Direction direction)
+        public Cell GetCell(Cell cell, Direction direction)
         {
             int xStart = (int)cell.CellPosition.x;
             int zStart = (int)cell.CellPosition.z;
@@ -312,16 +312,32 @@ namespace Voronoi
 
         private void CreateRoads()
         {
-            // Select starting road cell
-            Cell startCell = cells[Random.Range(0, cells.Length)];
-
-            int roadLength = 20;
-            Cell currentCell = startCell;
-            for (int i = 0; i < roadLength; i++)
+            // Determine number of roads
+            int roadCount = 30;
+            for (int i = 0; i < roadCount; i++)
             {
-                // TODO create roads here
-            }
+                // Select starting road cell
+                Cell startCell = cells[Random.Range(0, cells.Length)];
 
+                int roadLength = Random.Range(10, 20);
+                Cell currentCell = startCell;
+                Direction direction = Utility.GetRandomEnum<Direction>();
+                for (int j = 0; j < roadLength; j++)
+                {
+                    Cell nextCell = null;
+
+                    while (nextCell == null)
+                    {
+                        currentCell.AddRoad(direction);
+
+                        // Get the next cell
+                        nextCell = GetCell(currentCell, direction);
+                    }
+
+                    // Set the next cell to current cell
+                    currentCell = nextCell;
+                }
+            }
 
         }
 
