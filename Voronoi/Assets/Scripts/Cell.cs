@@ -55,7 +55,8 @@ namespace Voronoi
             // Need to also add a road to the neighbor cell
             // in the opposite direction
             Cell neighborCell = cellGrid.GetCell(this, direction);
-            neighborCell.AddRoad(OppositeDirection(direction));
+            if (neighborCell == null) { return; }
+            neighborCell.AddRoad(CellMetrics.OppositeDirection(direction));
         }
 
         public void AddRoad(Direction direction1, Direction direction2)
@@ -76,6 +77,8 @@ namespace Voronoi
             }
             return count;
         }
+
+        public Direction RegionRoadDirection { get; protected set; }
 
         public Cell SeedCell { get; protected set; }
 
@@ -114,7 +117,12 @@ namespace Voronoi
             return CurrentColor;
         }
 
-        public void SetAsSeedCell(Color setColor)
+        /// <summary>
+        /// Sets the cell to be a seed cell.
+        /// </summary>
+        /// <param name="setColor"></param>
+        /// <param name="roadDirections"></param>
+        public void SetAsSeedCell(Color setColor, Direction roadDirections)
         {
             if (IsSeedCell)
             {
@@ -123,6 +131,7 @@ namespace Voronoi
             }
             IsSeedCell = true;
             SeedCell = this;
+            RegionRoadDirection = roadDirections;
 
             // Select the color for this seed
             CurrentColor = setColor;
@@ -138,6 +147,10 @@ namespace Voronoi
             CellPosition = changedHeight;*/
         }
 
+        /// <summary>
+        /// Updates the reference seed cell to which this cell belongs.
+        /// </summary>
+        /// <param name="seedCell"></param>
         public void UpdateSeedCell(Cell seedCell)
         {
             if (IsSeedCell) 
@@ -154,6 +167,7 @@ namespace Voronoi
 
             // Change development type to match the seed cell
             DevType = seedCell.DevType;
+            RegionRoadDirection = seedCell.RegionRoadDirection;
         }
 
         public void PlaceModel(GameObject modelPrefab)
@@ -168,30 +182,8 @@ namespace Voronoi
 
         }
 
-        /// <summary>
-        /// Returns the opposite direction.
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        public Direction OppositeDirection(Direction direction)
-        {
-            if (direction == Direction.N)
-            {
-                 return Direction.S;
-            }
-            else if (direction == Direction.S)
-            {
-                return Direction.N;
-            }
-            else if (direction == Direction.E)
-            {
-                return Direction.W;
-            }
-            else //if (direction == Direction.W)
-            {
-                return Direction.E;
-            }
-        }
+
+
 
     }
 }

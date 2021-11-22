@@ -97,7 +97,7 @@ namespace Voronoi
             int counter = 0;
             foreach (int seedIndex in seedIndices)
             {
-                cells[seedIndex].SetAsSeedCell(colors[counter]);
+                cells[seedIndex].SetAsSeedCell(colors[counter], Utility.GetRandomEnum<Direction>());
                 counter += 1;
             }
 
@@ -258,14 +258,19 @@ namespace Voronoi
 
         public Cell GetCell(int x, int z)
         {
-            if (z > zSize || z < 0 ||
-                x > xSize || x < 0) 
+            if (z >= zSize || z < 0 ||
+                x >= xSize || x < 0) 
             { 
                 return null; 
             }
 
             int i = (x * xSize) + z;
 
+            if (i > cellCount || i < 0)
+            {
+                Debug.LogError("GetCell index out of bounds. i=" + i);
+                return null;
+            }
             return cells[i];
         }
 
@@ -312,30 +317,81 @@ namespace Voronoi
 
         private void CreateRoads()
         {
-            // Determine number of roads
-            int roadCount = 30;
+            // Random road segments
+            // Determine number of random roads
+            int roadCount = 100;
             for (int i = 0; i < roadCount; i++)
             {
                 // Select starting road cell
                 Cell startCell = cells[Random.Range(0, cells.Length)];
 
-                int roadLength = Random.Range(10, 20);
+                int roadLength = Random.Range(25, 50);
                 Cell currentCell = startCell;
                 Direction direction = Utility.GetRandomEnum<Direction>();
                 for (int j = 0; j < roadLength; j++)
                 {
-                    Cell nextCell = null;
+                    currentCell.AddRoad(direction);
 
-                    while (nextCell == null)
+                    // Small chance to change direction
+                    if (Random.value > 0.95)
                     {
-                        currentCell.AddRoad(direction);
-
-                        // Get the next cell
-                        nextCell = GetCell(currentCell, direction);
+                        direction = CellMetrics.RandomTurnDirection(direction);
                     }
+
+                    // Get the next cell
+                    Cell nextCell = GetCell(currentCell, direction);
+                    
+                    // If hit null try turning
+                    if (nextCell == null) 
+                    {
+                        // Get new direction and cell
+                        direction = CellMetrics.RandomTurnDirection(direction);
+                        nextCell = GetCell(currentCell, direction); 
+                    }
+                    // If cell is still null, exit
+                    if (nextCell == null) { break; }
+
+                    // Exit if neighbors already have roads
+                    int neighborsWithRoads = 0;
+                    for (int q = 0; q < 3; q++)
+                    {
+                        Cell neighborCell = GetCell(nextCell, (Direction)q);
+                        if (neighborCell == null) { continue; }
+
+                        if (neighborCell.IsRoad) { neighborsWithRoads += 1; }
+                    }
+                    if (neighborsWithRoads > 2) { break; }
 
                     // Set the next cell to current cell
                     currentCell = nextCell;
+                }
+            }
+
+            int xRoadFrequency = 3;
+            int yRoadFrequency = 3;
+            // Fill in grid with extra roads
+            for (int i = 0; i < cellCount; i++)
+            {
+                Cell cell = cells[i];
+                // Skip cell if it is a seedcell
+                if (cell.IsSeedCell) { continue; }
+
+                if (cell.RegionRoadDirection == Direction.W ||
+                    cell.RegionRoadDirection == Direction.E)
+                {
+                    if (cell.CellPosition.x % xRoadFrequency == 0)
+                    {
+                        cell.AddRoad(Direction.W);
+                    }
+                }
+
+                if (cell.RegionRoadDirection == Direction.N ||
+                    cell.RegionRoadDirection == Direction.S)
+                {
+                    if (cell.CellPosition.z % yRoadFrequency == 0)
+                    {
+                        cell.AddRoad(Direction.N);
+                    }
                 }
             }
 
